@@ -89,6 +89,21 @@ app.use(globalErrorHandler);
 export default app;
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
+
+// 🌱 SAFE SEED TRIGGER (ADD THIS)
+if (process.env.RUN_SEED === 'true') {
+  (async () => {
+    try {
+      console.log('🌱 Running seed...');
+      const { execSync } = require('child_process');
+      execSync('npx prisma db seed', { stdio: 'inherit' });
+      console.log('✅ Seed completed');
+    } catch (err) {
+      console.error('❌ Seed failed, continuing startup');
+    }
+  })();
+}
+
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[Server] Running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
