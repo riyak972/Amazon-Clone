@@ -8,4 +8,4 @@ RUN npx prisma generate
 RUN npm run build
 
 # We use shell form to execute these multiple commands on startup as requested by user
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/app.js"]
+CMD sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/app.js"
