@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-import { prisma } from './config/database';
+import prisma from './config/database';
 import { redis } from './config/redis';
 // Modules
 import authRoutes from './modules/auth/auth.routes';
