@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: amazon_user
+      POSTGRES_PASSWORD: amazon_pass
+      POSTGRES_DB: amazon_clone
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - amazon_net
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - amazon_net
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: "postgresql://amazon_user:amazon_pass@postgres:5432/amazon_clone?schema=public"
+      REDIS_URL: "redis://redis:6379"
+    networks:
+      - amazon_net
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    env_file:
+      - ./frontend/.env
+    networks:
+      - amazon_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  amazon_net:
+    driver: bridge
